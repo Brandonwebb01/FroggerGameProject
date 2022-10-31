@@ -16,18 +16,30 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	//instances of our data classes (store position, etc here)
 	private Frog frog;
 	private Car car;
+	private Background background;
+	private Log log;
 	
 	//graphic elements
 	private Container content;
-	private JLabel frogLabel, carLabel;
-	private ImageIcon carImage, frogImage;
+	private JLabel frogLabel, carLabel, backgroundLabel, logLabel;
+	private ImageIcon carImage, frogImage, backgroundImage, logImage;
 	
 	//buttons
 	private JButton StartButton;
 	private JButton VisibilityButton;
 	
 	public GamePrep() {
-		//set up character1
+		
+			
+		//set up background
+		background = new Background();
+		background.setX(0);
+		background.setY(0);
+		background.setImage("background.png");
+		background.setWidth(1000);
+		background.setHeight(800);
+		
+		//set up frog
 		frog = new Frog();
 		frog.setX(0);
 		frog.setY(200);
@@ -35,7 +47,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		frog.setHeight(39);
 		frog.setImage("frog-sprite.png");
 
-		//set up character1
+		//set up car
 		car = new Car();
 		car.setX(0);
 		car.setY(0);
@@ -45,6 +57,17 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		car.setMoving(false);
 		car.setImage("car-sprite.png");
 		car.setFrog(frog);
+		
+		//set up log
+		log = new Log();
+		log.setX(200);
+		log.setY(200);
+		log.setWidth(75);
+		log.setHeight(75);
+		log.setVisible(true);
+		log.setMoving(false);
+		log.setImage("log-sprite.png");
+		log.setFrog(frog);
 
 		//set up screen
 		setSize(GameProperties.SCREEN_WIDTH, GameProperties.SCREEN_HEIGHT);
@@ -67,6 +90,19 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		carLabel.setLocation(car.getX(), car.getY());
 		car.setCarLabel(carLabel);
 		
+		logLabel = new JLabel();
+		logImage = new ImageIcon(getClass().getResource(log.getImage()));
+		logLabel.setIcon(logImage);
+		logLabel.setSize(log.getWidth(), log.getHeight());
+		logLabel.setLocation(log.getX(), log.getY());
+		log.setLogLabel(logLabel);
+		
+		backgroundLabel = new JLabel();
+		backgroundImage = new ImageIcon(getClass().getResource(background.getImage()));
+		backgroundLabel.setIcon(backgroundImage);
+		backgroundLabel.setSize(background.getWidth(), background.getHeight());
+		backgroundLabel.setLocation(background.getX(),background.getY());
+		
 		//add a start button
 		StartButton = new JButton ("Start");
 		StartButton.setSize(100, 100);
@@ -74,6 +110,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 				                GameProperties.SCREEN_HEIGHT-200);
 		StartButton.setFocusable(false);
 		car.setStartButton(StartButton);
+		log.setStartButton(StartButton);
 		
 		
 		//add a disappear button
@@ -91,6 +128,8 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		VisibilityButton.addActionListener(this);
 		add(frogLabel);
 		add(carLabel);
+		add(logLabel);
+		add(backgroundLabel);
 		
 		
 		content.addKeyListener(this);
@@ -163,14 +202,16 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		//distinguish among buttons
 		if (e.getSource() == StartButton) {
-			if ( car.getMoving() ) {
+			if ( car.getMoving() || log.getMoving()) {
 				//stop, update button text to start
 				car.setMoving(false);
+				log.setMoving(false);
 				//StartButton.setText("Start");
 			} else {
 				//start, update button text to stop
 				//character2.setMoving(true);
 				car.startMoving();
+				log.startMoving();
 				//StartButton.setText("Stop");
 			}
 			
