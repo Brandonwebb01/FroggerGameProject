@@ -18,6 +18,9 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	private Car car;
 	private Background background;
 	private Log log;
+
+	//make array of cars
+	private Car[] cars = new Car[3];
 	
 	//graphic elements
 	private Container content;
@@ -47,16 +50,21 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		frog.setHeight(39);
 		frog.setImage("frog-sprite.png");
 
+		for (int i = 0; i < cars.length; i++) {
+			cars[i] = new Car();
+			cars[i].setY(500);
+			cars[i].setFrog(frog);
+		}
 		//set up car
-		car = new Car();
-		car.setX(0);
-		car.setY(0);
-		car.setWidth(75);
-		car.setHeight(41);
-		car.setVisible(true);
-		car.setMoving(false);
-		car.setImage("car-sprite.png");
-		car.setFrog(frog);
+		// car = new Car();
+		// car.setX(0);
+		// car.setY(0);
+		// car.setWidth(75);
+		// car.setHeight(41);
+		// car.setVisible(true);
+		// car.setMoving(false);
+		// car.setImage("car-sprite.png");
+		// car.setFrog(frog);
 		
 		//set up log
 		log = new Log();
@@ -81,14 +89,17 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		frogLabel.setIcon(frogImage);
 		frogLabel.setSize(frog.getWidth(), frog.getHeight());
 		frogLabel.setLocation(frog.getX(),frog.getY());
-		car.setFrogLabel(frogLabel);
+		//car.setFrogLabel(frogLabel);
 		
-		carLabel = new JLabel();
-		carImage = new ImageIcon(getClass().getResource(car.getImage()));
-		carLabel.setIcon(carImage);
-		carLabel.setSize(car.getWidth(), car.getHeight());
-		carLabel.setLocation(car.getX(), car.getY());
-		car.setCarLabel(carLabel);
+		for (int i = 0; i < cars.length; i++) {
+            carLabel = new JLabel();
+            carImage = new ImageIcon(getClass().getResource(cars[i].getImage()));
+            carLabel.setIcon(carImage);
+            carLabel.setSize(cars[i].getWidth(), cars[i].getHeight());
+            carLabel.setLocation(cars[i].getX(), cars[i].getY());
+            cars[i].setCarLabel(carLabel);
+            content.add(carLabel);
+        }
 		
 		logLabel = new JLabel();
 		logImage = new ImageIcon(getClass().getResource(log.getImage()));
@@ -109,7 +120,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		StartButton.setLocation(GameProperties.SCREEN_WIDTH-100, 
 				                GameProperties.SCREEN_HEIGHT-200);
 		StartButton.setFocusable(false);
-		car.setStartButton(StartButton);
+		// car.setStartButton(StartButton);
 		log.setStartButton(StartButton);
 		
 		
@@ -202,18 +213,36 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		//distinguish among buttons
 		if (e.getSource() == StartButton) {
-			if ( car.getMoving() || log.getMoving()) {
-				//stop, update button text to start
-				car.setMoving(false);
-				log.setMoving(false);
-				//StartButton.setText("Start");
-			} else {
-				//start, update button text to stop
-				//character2.setMoving(true);
-				car.startMoving();
-				log.startMoving();
-				//StartButton.setText("Stop");
-			}
+
+			for (int i = 0; i < cars.length; i++) {
+                cars[i].setCarID(i);
+                if ( cars[i].getMoving()) {
+                    //stop, update button text to start
+                    cars[i].setVisible(false);
+                    cars[i].setMoving(false);
+                    //log.setMoving(false);
+                    //StartButton.setText("Start");
+                } else {
+                    //start, update button text to stop
+                    //character2.setMoving(true);
+                    cars[i].setVisible(true);
+                    cars[i].startMoving();
+                    //log.startMoving();
+                    //StartButton.setText("Stop");
+                }
+            }
+			// if ( car.getMoving() || log.getMoving()) {
+			// 	//stop, update button text to start
+			// 	car.setMoving(false);
+			// 	log.setMoving(false);
+			// 	//StartButton.setText("Start");
+			// } else {
+			// 	//start, update button text to stop
+			// 	//character2.setMoving(true);
+			// 	car.startMoving();
+			// 	log.startMoving();
+			// 	//StartButton.setText("Stop");
+			// }
 			
 			
 		} else if (e.getSource() == VisibilityButton) {

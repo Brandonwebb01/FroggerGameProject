@@ -10,13 +10,22 @@ public class Car extends Sprite implements Runnable {
 	private Thread t;
 	private JLabel CarLabel, FrogLabel;
 	private Frog Frog;
-	private JButton StartButton;
+	// private JButton StartButton;
+	private int carID;
 	
 	public Car() {
 		super(0, 0, 75, 41, "car-sprite.png");
 		this.visible = true;
 		this.moving = false;
 	}
+
+	public int getCarID() {
+        return carID;
+    }
+
+    public void setCarID(int carID) {
+        this.carID = carID;
+    }
 	
 	public void setCarLabel(JLabel temp) {
 		this.CarLabel = temp;
@@ -30,9 +39,9 @@ public class Car extends Sprite implements Runnable {
 		this.FrogLabel = temp;
 	}
 
-	public void setStartButton(JButton temp) {
-		this.StartButton = temp;
-	}
+	// public void setStartButton(JButton temp) {
+	// 	this.StartButton = temp;
+	// }
 
 	public Boolean getVisible() {
 		return visible;
@@ -79,33 +88,46 @@ public class Car extends Sprite implements Runnable {
 	public void run() {
 		System.out.println("Thread started");
 		this.moving = true;
-		this.StartButton.setText("Stop");
+		//this.StartButton.setText("Stop");
 
-		this.FrogLabel.setIcon(
-				new ImageIcon( getClass().getResource("frog-sprite.png") )
-				);
-		this.CarLabel.setIcon(
-				new ImageIcon( getClass().getResource("car-sprite.png") )
-				);
+		if (getCarID() > 0) {
+            // sleep for a random amount of time between 2 and 5 seconds
+            try {
+                Thread.sleep((int)(Math.random() * 3000) + 2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+		// this.FrogLabel.setIcon(
+		// 		new ImageIcon( getClass().getResource("frog-sprite.png") )
+		// 		);
+		// this.CarLabel.setIcon(
+		// 		new ImageIcon( getClass().getResource("car-sprite.png") )
+		// 		);
 
 		while (this.moving) {
 			//moving instructions
 			
 			//get current x
-			int currentX = this.x;
-			
-			//increase x
-			currentX += GameProperties.CHARACTER_STEP;
-			
-			//boundary check right-side
-			if (currentX >= GameProperties.SCREEN_WIDTH) {
-				currentX = -1 * this.width;
-			}
-			
-			//update x
-			//this.x = currentX;
-			this.setX(currentX);
-			System.out.println("X, Y: " + this.x + "," + this.y);
+            int currentX = this.x;
+            int currentY = this.y;
+
+            //increase x
+            currentX += GameProperties.CHARACTER_STEP;
+
+            //boundary check right-side
+            if (currentX >= GameProperties.SCREEN_WIDTH) {
+                currentX = -1 * this.width;
+                // set currentY to a random value between 400 and 750
+                currentY = (int) (Math.random() * (750 - 400 + 1) + 400);
+            }
+
+            //update x
+            //this.x = currentX;
+            this.setX(currentX);
+            this.setY(currentY);
+            System.out.println("X, Y: " + this.x + "," + this.y);
 			
 			//check for collision
 			if ( this.visible ) this.detectCollision();
@@ -122,7 +144,7 @@ public class Car extends Sprite implements Runnable {
 			
 		}
 		System.out.println("End Thread");
-		this.StartButton.setText("Start");
+		// this.StartButton.setText("Start");
 		
 	}
 	
@@ -130,12 +152,12 @@ public class Car extends Sprite implements Runnable {
 		if (r.intersects( Frog.getRectangle() )) {
 			System.out.println("BOOM!");
 			this.moving = false;
-			this.FrogLabel.setIcon(
-					new ImageIcon( getClass().getResource("frog-sprite.png") )
-					);
-			this.CarLabel.setIcon(
-					new ImageIcon( getClass().getResource("car-sprite.png") )
-					);
+			// this.FrogLabel.setIcon(
+			// 		new ImageIcon( getClass().getResource("frog-sprite.png") )
+			// 		);
+			// this.CarLabel.setIcon(
+			// 		new ImageIcon( getClass().getResource("car-sprite.png") )
+			// 		);
 		}
 	}
 
