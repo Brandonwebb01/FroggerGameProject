@@ -1,6 +1,4 @@
 //NPC
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 //this is the object that as the thread
@@ -8,13 +6,12 @@ public class Car extends Sprite implements Runnable {
 
 	private Boolean visible, moving;
 	private Thread t;
-	private JLabel CarLabel, FrogLabel;
+	private JLabel CarLabel;
 	private Frog Frog;
-	// private JButton StartButton;
 	private int carID;
 	
 	public Car() {
-		super(0, 0, 75, 41, "car-sprite.png");
+		super(0, 0, 41, 75, "car-sprite.png");
 		this.visible = true;
 		this.moving = false;
 	}
@@ -34,14 +31,6 @@ public class Car extends Sprite implements Runnable {
 	public void setFrog(Frog temp) {
 		this.Frog = temp;
 	}
-
-	public void setFrogLabel(JLabel temp) {
-		this.FrogLabel = temp;
-	}
-
-	// public void setStartButton(JButton temp) {
-	// 	this.StartButton = temp;
-	// }
 
 	public Boolean getVisible() {
 		return visible;
@@ -88,30 +77,32 @@ public class Car extends Sprite implements Runnable {
 	public void run() {
 		System.out.println("Thread started");
 		this.moving = true;
-		//this.StartButton.setText("Stop");
 
-		if (getCarID() > 0) {
-            // sleep for a random amount of time between 2 and 5 seconds
+		if (getCarID() == 1) {
             try {
-                Thread.sleep((int)(Math.random() * 3000) + 2000);
+                Thread.sleep(500 + (int)(Math.random() * 1000));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else if (getCarID() == 2) {
+            try {
+                Thread.sleep(2500 + (int)(Math.random() * 2000));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else if (getCarID() == 3) {
+            try {
+                Thread.sleep(5500 + (int)(Math.random() * 1500));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
-		// this.FrogLabel.setIcon(
-		// 		new ImageIcon( getClass().getResource("frog-sprite.png") )
-		// 		);
-		// this.CarLabel.setIcon(
-		// 		new ImageIcon( getClass().getResource("car-sprite.png") )
-		// 		);
 
 		while (this.moving) {
 			//moving instructions
 			
 			//get current x
             int currentX = this.x;
-            int currentY = this.y;
 
             //increase x
             currentX += GameProperties.CHARACTER_STEP;
@@ -119,47 +110,30 @@ public class Car extends Sprite implements Runnable {
             //boundary check right-side
             if (currentX >= GameProperties.SCREEN_WIDTH) {
                 currentX = -1 * this.width;
-                // set currentY to a random value between 400 and 750
-                currentY = (int) (Math.random() * (750 - 400 + 1) + 400);
             }
-
-            //update x
-            //this.x = currentX;
             this.setX(currentX);
-            this.setY(currentY);
-            System.out.println("X, Y: " + this.x + "," + this.y);
-			
-			//check for collision
-			if ( this.visible ) this.detectCollision();
+            // System.out.println("X, Y: " + this.x + "," + this.y);
+
+			 //check for collision
+            if ( this.visible ) {
+                if (isColliding(Frog)) {
+                    System.out.println("BOOM!");
+                    this.moving = false;
+					// tomorrow implement imageIcon
+                }
+            }
 			
 			//update Character2Label
 			this.CarLabel.setLocation(this.x, this.y);
 			
 			//pause
 			try {
-				Thread.sleep(200);
+				Thread.sleep(100);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
 		}
-		System.out.println("End Thread");
-		// this.StartButton.setText("Start");
-		
+		System.out.println("End Thread");	
 	}
-	
-	private void detectCollision() {
-		if (r.intersects( Frog.getRectangle() )) {
-			System.out.println("BOOM!");
-			this.moving = false;
-			// this.FrogLabel.setIcon(
-			// 		new ImageIcon( getClass().getResource("frog-sprite.png") )
-			// 		);
-			// this.CarLabel.setIcon(
-			// 		new ImageIcon( getClass().getResource("car-sprite.png") )
-			// 		);
-		}
-	}
-
-
 }

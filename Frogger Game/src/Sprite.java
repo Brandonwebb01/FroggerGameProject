@@ -86,4 +86,8 @@ public class Sprite {
 	public Rectangle getRectangle() {
 		return this.r;
 	}
+
+	public boolean isColliding(Sprite other) {
+        return this.r.intersects(other.getRectangle());
+    }
 }

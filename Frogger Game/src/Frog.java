@@ -4,5 +4,4 @@ public class Frog extends Sprite {
 	public Frog() {
 		super(0, 0, 50, 39, "frog-sprite.png");
 	}
-	
 }

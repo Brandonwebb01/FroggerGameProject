@@ -19,13 +19,25 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	private Background background;
 	private Log log;
 
-	//make array of cars
+	//array of cars
 	private Car[] cars = new Car[3];
+	private Car[] cars2 = new Car[3];
+	private Car[] cars3 = new Car[3];
+	private Car[] cars4 = new Car[3];
+	private Car[] cars5 = new Car[3];
+
+	//array of logs
+	private Log[] logs = new Log[3];
+	private Log[] logs2 = new Log[3];
+	private Log[] logs3 = new Log[3];
+	private Log[] logs4 = new Log[3];
+	private Log[] logs5 = new Log[3];
+	private Log[] logs6 = new Log[3];
 	
 	//graphic elements
 	private Container content;
 	private JLabel frogLabel, carLabel, backgroundLabel, logLabel;
-	private ImageIcon carImage, frogImage, backgroundImage, logImage;
+	private ImageIcon carImage, backgroundImage, logImage, frogImage, frogImageDown, frogImageRight, frogImageLeft;
 	
 	//buttons
 	private JButton StartButton;
@@ -41,41 +53,31 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		background.setImage("background.png");
 		background.setWidth(1000);
 		background.setHeight(800);
+
+		//graphic element instantiation and add to screen
+		backgroundLabel = new JLabel();
+		backgroundImage = new ImageIcon(getClass().getResource(background.getImage()));
+		backgroundLabel.setIcon(backgroundImage);
+		backgroundLabel.setSize(background.getWidth(), background.getHeight());
+		backgroundLabel.setLocation(background.getX(),background.getY());
 		
 		//set up frog
 		frog = new Frog();
-		frog.setX(0);
-		frog.setY(200);
+		frog.setX(450);
+		frog.setY(750);
 		frog.setWidth(50);
 		frog.setHeight(39);
 		frog.setImage("frog-sprite.png");
 
-		for (int i = 0; i < cars.length; i++) {
-			cars[i] = new Car();
-			cars[i].setY(500);
-			cars[i].setFrog(frog);
-		}
-		//set up car
-		// car = new Car();
-		// car.setX(0);
-		// car.setY(0);
-		// car.setWidth(75);
-		// car.setHeight(41);
-		// car.setVisible(true);
-		// car.setMoving(false);
-		// car.setImage("car-sprite.png");
-		// car.setFrog(frog);
-		
-		//set up log
-		log = new Log();
-		log.setX(200);
-		log.setY(200);
-		log.setWidth(75);
-		log.setHeight(75);
-		log.setVisible(true);
-		log.setMoving(false);
-		log.setImage("log-sprite.png");
-		log.setFrog(frog);
+		//graphic element instantiation and add to screen
+		frogLabel = new JLabel();
+		frogImage = new ImageIcon(getClass().getResource(frog.getImage()));
+		frogImageDown = new ImageIcon(getClass().getResource("frog-sprite-down.png"));
+		frogImageRight = new ImageIcon(getClass().getResource("frog-sprite-right.png"));
+		frogImageLeft = new ImageIcon(getClass().getResource("frog-sprite-left.png"));
+		frogLabel.setIcon(frogImage);
+		frogLabel.setSize(frog.getWidth(), frog.getHeight());
+		frogLabel.setLocation(frog.getX(),frog.getY());
 
 		//set up screen
 		setSize(GameProperties.SCREEN_WIDTH, GameProperties.SCREEN_HEIGHT);
@@ -83,36 +85,18 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		content.setBackground(Color.gray);
 		setLayout(null);
 		
-		//graphic element instantiation and add to screen
-		frogLabel = new JLabel();
-		frogImage = new ImageIcon(getClass().getResource(frog.getImage()));
-		frogLabel.setIcon(frogImage);
-		frogLabel.setSize(frog.getWidth(), frog.getHeight());
-		frogLabel.setLocation(frog.getX(),frog.getY());
-		//car.setFrogLabel(frogLabel);
-		
-		for (int i = 0; i < cars.length; i++) {
-            carLabel = new JLabel();
-            carImage = new ImageIcon(getClass().getResource(cars[i].getImage()));
-            carLabel.setIcon(carImage);
-            carLabel.setSize(cars[i].getWidth(), cars[i].getHeight());
-            carLabel.setLocation(cars[i].getX(), cars[i].getY());
-            cars[i].setCarLabel(carLabel);
-            content.add(carLabel);
-        }
-		
-		logLabel = new JLabel();
-		logImage = new ImageIcon(getClass().getResource(log.getImage()));
-		logLabel.setIcon(logImage);
-		logLabel.setSize(log.getWidth(), log.getHeight());
-		logLabel.setLocation(log.getX(), log.getY());
-		log.setLogLabel(logLabel);
-		
-		backgroundLabel = new JLabel();
-		backgroundImage = new ImageIcon(getClass().getResource(background.getImage()));
-		backgroundLabel.setIcon(backgroundImage);
-		backgroundLabel.setSize(background.getWidth(), background.getHeight());
-		backgroundLabel.setLocation(background.getX(),background.getY());
+		createCars(cars, -75, 450);
+		createCars(cars2, -75, 510);
+		createCars(cars3, -75, 570);
+		createCars(cars4, -75, 630);
+		createCars(cars5, -75, 690);
+
+		createLogs(logs, -75, 50);
+		createLogs(logs2, -75, 100);
+		createLogs(logs3, -75, 150);
+		createLogs(logs4, -75, 200);
+		createLogs(logs5, -75, 250);
+		createLogs(logs6, -75, 300);
 		
 		//add a start button
 		StartButton = new JButton ("Start");
@@ -120,8 +104,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		StartButton.setLocation(GameProperties.SCREEN_WIDTH-100, 
 				                GameProperties.SCREEN_HEIGHT-200);
 		StartButton.setFocusable(false);
-		// car.setStartButton(StartButton);
-		log.setStartButton(StartButton);
 		
 		
 		//add a disappear button
@@ -130,7 +112,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		VisibilityButton.setLocation(GameProperties.SCREEN_WIDTH-100, 
 				                     GameProperties.SCREEN_HEIGHT-100);
 		VisibilityButton.setFocusable(false);
-	
 		
 		//populate screen
 		add(StartButton);
@@ -155,7 +136,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		myGame.setVisible(true);
 	}
 
-
 	@Override
 	public void keyTyped(KeyEvent e) {}
 
@@ -168,28 +148,28 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		//modify position
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
 			y -= GameProperties.CHARACTER_STEP;
-			
+			frogLabel.setIcon(frogImage);
 			if (y + frog.getHeight() <= 0) {
 				y = GameProperties.SCREEN_HEIGHT;
 			}
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			y += GameProperties.CHARACTER_STEP;
-			
+			frogLabel.setIcon(frogImageDown);
 			if (y >= GameProperties.SCREEN_HEIGHT) {
 				y = -1 * frog.getHeight();
 			}
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 			x -= GameProperties.CHARACTER_STEP;	
-			
+			frogLabel.setIcon(frogImageLeft);
 			if (x + frog.getWidth() <= 0) {
 				x = GameProperties.SCREEN_WIDTH;
 			}			
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			x += GameProperties.CHARACTER_STEP;	
-			
+			frogLabel.setIcon(frogImageRight);
 			if (x >= GameProperties.SCREEN_WIDTH) {
 				x = -1 * frog.getWidth();
 			}
@@ -214,37 +194,20 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		//distinguish among buttons
 		if (e.getSource() == StartButton) {
 
-			for (int i = 0; i < cars.length; i++) {
-                cars[i].setCarID(i);
-                if ( cars[i].getMoving()) {
-                    //stop, update button text to start
-                    cars[i].setVisible(false);
-                    cars[i].setMoving(false);
-                    //log.setMoving(false);
-                    //StartButton.setText("Start");
-                } else {
-                    //start, update button text to stop
-                    //character2.setMoving(true);
-                    cars[i].setVisible(true);
-                    cars[i].startMoving();
-                    //log.startMoving();
-                    //StartButton.setText("Stop");
-                }
-            }
-			// if ( car.getMoving() || log.getMoving()) {
-			// 	//stop, update button text to start
-			// 	car.setMoving(false);
-			// 	log.setMoving(false);
-			// 	//StartButton.setText("Start");
-			// } else {
-			// 	//start, update button text to stop
-			// 	//character2.setMoving(true);
-			// 	car.startMoving();
-			// 	log.startMoving();
-			// 	//StartButton.setText("Stop");
-			// }
+			showCarsArray(cars);
+			showCarsArray(cars2);
+			showCarsArray(cars3);
+			showCarsArray(cars4);
+			showCarsArray(cars5);
+
+			showLogsArray(logs);
+			showLogsArray(logs2);
+			showLogsArray(logs3);
+			showLogsArray(logs4);
+			showLogsArray(logs5);
+			showLogsArray(logs6);
 			
-			
+					
 		} else if (e.getSource() == VisibilityButton) {
 			//check the visibility of the character2 object
 			if ( car.getVisible() ) {
@@ -259,7 +222,67 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 				VisibilityButton.setText("Hide");
 			}
 		}
-		
-		
+	}
+
+	public void createCars(Car[] car, int x, int y) {
+        for (int i = 0; i < car.length; i++) {
+            car[i] = new Car();
+            car[i].setY(y);
+            car[i].setX(x);
+            car[i].setFrog(frog);
+
+            carLabel = new JLabel();
+            carImage = new ImageIcon(getClass().getResource(car[i].getImage()));
+            carLabel.setIcon(carImage);
+            carLabel.setSize(car[i].getWidth(), car[i].getHeight());
+            carLabel.setLocation(car[i].getX(), car[i].getY());
+            car[i].setCarLabel(carLabel);
+            content.add(carLabel);
+        }
+    }
+
+	//create logs
+	public void createLogs(Log[] log, int x, int y) {
+		for (int i = 0; i < log.length; i++) {
+			log[i] = new Log();
+			log[i].setY(y);
+			log[i].setX(x);
+			log[i].setFrog(frog);
+
+			logLabel = new JLabel();
+			logImage = new ImageIcon(getClass().getResource(log[i].getImage()));
+			logLabel.setIcon(logImage);
+			logLabel.setSize(log[i].getWidth(), log[i].getHeight());
+			logLabel.setLocation(log[i].getX(), log[i].getY());
+			log[i].setLogLabel(logLabel);
+			content.add(logLabel);
+		}
+	}
+
+	public void showCarsArray(Car[] carArray) {
+		for (int i = 0; i < carArray.length; i++) {
+			carArray[i].setCarID(i);
+			if ( carArray[i].getMoving()) {
+				carArray[i].setVisible(false);
+				carArray[i].setMoving(false);
+			} else {
+				carArray[i].setVisible(true);
+				carArray[i].startMoving();
+			}
+		}
+	}
+
+	public void showLogsArray(Log[] logArray) {
+		for (int i = 0; i < logArray.length; i++) {
+			logArray[i].setLogID(i);
+			if ( logArray[i].getMoving()) {
+				logArray[i].setVisible(false);
+				logArray[i].setMoving(false);
+			} else {
+				logArray[i].setVisible(true);
+				logArray[i].startMoving();
+			}
+		}
 	}
 }
+
