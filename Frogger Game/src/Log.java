@@ -1,11 +1,9 @@
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 //Player Character
 public class Log extends Sprite implements Runnable {
 	
-	private Boolean visible, moving;
+	private Boolean visible, moving, reverseDirection;
 	private Thread t;
 	private JLabel logLabel;
 	private Frog Frog;
@@ -16,6 +14,7 @@ public class Log extends Sprite implements Runnable {
 		super(0, 0, 75, 75, "log-sprite.png");
 		this.visible = true;
 		this.moving = false;
+		this.reverseDirection = true;
 	}
 
 	public int getLogID() {
@@ -57,12 +56,19 @@ public class Log extends Sprite implements Runnable {
 	public void hide() {
 		this.visible = true;
 	}
+
+	public Boolean getReverseDirection() {
+		return reverseDirection;
+	}
+
+	public void setReverseDirection(Boolean reverseDirection) {
+		this.reverseDirection = reverseDirection;
+	}
 	
 	public void Display () {
 		System.out.println("x,y: " + this.x + "," + this.y);
 		System.out.println("width,height: " + this.width + "," + height);
 		System.out.println("image: " + this.image);
-		//super.Display();
 		System.out.println("visible: " + this.visible);
 		System.out.println("moving: " + this.moving);
 	}
@@ -100,39 +106,79 @@ public class Log extends Sprite implements Runnable {
             }
         }
 
-		while (this.moving) {
-			//moving instructions
-			
-			//get current x
-            int currentX = this.x;
+		if (this.reverseDirection == true) {
 
-            //increase x
-            currentX += GameProperties.CHARACTER_STEP;
+			while (this.moving) {
+				//moving instructions
+				
+				//get current x
+				int currentX = this.x;
+	
+				//increase x
+				currentX += GameProperties.CHARACTER_STEP;
+	
+				//boundary check right-side
+				if (currentX >= GameProperties.SCREEN_WIDTH) {
+					currentX = -1 * this.width;
+				}
+				this.setX(currentX);
+				// System.out.println("X, Y: " + this.x + "," + this.y);
+	
+				 //check for collision
+				if ( this.visible ) {
+					if (isColliding(Frog)) {
+						System.out.println("On Log");
+					}
+				}
+				
+				//update Character2Label
+				this.logLabel.setLocation(this.x, this.y);
+				
+				//pause
+				try {
+					Thread.sleep(200);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
 
-            //boundary check right-side
-            if (currentX >= GameProperties.SCREEN_WIDTH) {
-                currentX = -1 * this.width;
-            }
-            this.setX(currentX);
-            // System.out.println("X, Y: " + this.x + "," + this.y);
-
-			 //check for collision
-            if ( this.visible ) {
-                if (isColliding(Frog)) {
-                    System.out.println("On Log");
-                }
-            }
-			
-			//update Character2Label
-			this.logLabel.setLocation(this.x, this.y);
-			
-			//pause
-			try {
-				Thread.sleep(200);
-			} catch (Exception e) {
-				e.printStackTrace();
+			while (this.moving) {
+				//moving instructions
+				
+				//get current x
+				int currentX = this.x;
+	
+				//increase x
+				currentX -= GameProperties.CHARACTER_STEP;
+	
+				//boundary check right-side
+				if (currentX <= -1 * this.width) {
+					currentX = GameProperties.SCREEN_WIDTH;
+				}
+				this.setX(currentX);
+				// System.out.println("X, Y: " + this.x + "," + this.y);
+	
+				 //check for collision
+				if ( this.visible ) {
+					if (isColliding(Frog)) {
+						System.out.println("On Log");
+					}
+				}
+				
+				//update Character2Label
+				this.logLabel.setLocation(this.x, this.y);
+				
+				//pause
+				try {
+					Thread.sleep(200);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
+
+		
 		System.out.println("End Thread");	
 	}
 }

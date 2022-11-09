@@ -1,4 +1,3 @@
-//NPC
 import javax.swing.JLabel;
 
 //this is the object that as the thread
@@ -60,7 +59,6 @@ public class Car extends Sprite implements Runnable {
 		System.out.println("x,y: " + this.x + "," + this.y);
 		System.out.println("width,height: " + this.width + "," + height);
 		System.out.println("image: " + this.image);
-		//super.Display();
 		System.out.println("visible: " + this.visible);
 		System.out.println("moving: " + this.moving);
 	}
@@ -119,7 +117,6 @@ public class Car extends Sprite implements Runnable {
                 if (isColliding(Frog)) {
                     System.out.println("BOOM!");
                     this.moving = false;
-					// tomorrow implement imageIcon
                 }
             }
 			

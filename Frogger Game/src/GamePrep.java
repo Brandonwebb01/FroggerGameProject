@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,7 +16,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	private Frog frog;
 	private Car car;
 	private Background background;
-	private Log log;
 
 	//array of cars
 	private Car[] cars = new Car[3];
@@ -37,7 +35,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	//graphic elements
 	private Container content;
 	private JLabel frogLabel, carLabel, backgroundLabel, logLabel;
-	private ImageIcon carImage, backgroundImage, logImage, frogImage, frogImageDown, frogImageRight, frogImageLeft;
+	private ImageIcon carImage, backgroundImage, logImage;
 	
 	//buttons
 	private JButton StartButton;
@@ -60,24 +58,9 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		backgroundLabel.setIcon(backgroundImage);
 		backgroundLabel.setSize(background.getWidth(), background.getHeight());
 		backgroundLabel.setLocation(background.getX(),background.getY());
-		
-		//set up frog
-		frog = new Frog();
-		frog.setX(450);
-		frog.setY(750);
-		frog.setWidth(50);
-		frog.setHeight(39);
-		frog.setImage("frog-sprite.png");
 
-		//graphic element instantiation and add to screen
-		frogLabel = new JLabel();
-		frogImage = new ImageIcon(getClass().getResource(frog.getImage()));
-		frogImageDown = new ImageIcon(getClass().getResource("frog-sprite-down.png"));
-		frogImageRight = new ImageIcon(getClass().getResource("frog-sprite-right.png"));
-		frogImageLeft = new ImageIcon(getClass().getResource("frog-sprite-left.png"));
-		frogLabel.setIcon(frogImage);
-		frogLabel.setSize(frog.getWidth(), frog.getHeight());
-		frogLabel.setLocation(frog.getX(),frog.getY());
+		frog = new Frog();
+		frogLabel = frog.getFrogLabel();
 
 		//set up screen
 		setSize(GameProperties.SCREEN_WIDTH, GameProperties.SCREEN_HEIGHT);
@@ -91,12 +74,12 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		createCars(cars4, -75, 630);
 		createCars(cars5, -75, 690);
 
-		createLogs(logs, -75, 50);
-		createLogs(logs2, -75, 100);
-		createLogs(logs3, -75, 150);
-		createLogs(logs4, -75, 200);
-		createLogs(logs5, -75, 250);
-		createLogs(logs6, -75, 300);
+		createLogs(logs, -75, 50, true);
+		createLogs(logs2, -75, 100, false);
+		createLogs(logs3, -75, 150, true);
+		createLogs(logs4, -75, 200, false);
+		createLogs(logs5, -75, 250, true);
+		createLogs(logs6, -75, 300, false);
 		
 		//add a start button
 		StartButton = new JButton ("Start");
@@ -126,6 +109,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		
 		content.addKeyListener(this);
 		content.setFocusable(true);
+		content.setComponentZOrder(frogLabel, 0);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -148,28 +132,28 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		//modify position
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
 			y -= GameProperties.CHARACTER_STEP;
-			frogLabel.setIcon(frogImage);
+			frogLabel.setIcon(frog.getFrogImage());
 			if (y + frog.getHeight() <= 0) {
 				y = GameProperties.SCREEN_HEIGHT;
 			}
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			y += GameProperties.CHARACTER_STEP;
-			frogLabel.setIcon(frogImageDown);
+			frogLabel.setIcon(frog.getFrogImageDown());
 			if (y >= GameProperties.SCREEN_HEIGHT) {
 				y = -1 * frog.getHeight();
 			}
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 			x -= GameProperties.CHARACTER_STEP;	
-			frogLabel.setIcon(frogImageLeft);
+			frogLabel.setIcon(frog.getFrogImageLeft());
 			if (x + frog.getWidth() <= 0) {
 				x = GameProperties.SCREEN_WIDTH;
 			}			
 			
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			x += GameProperties.CHARACTER_STEP;	
-			frogLabel.setIcon(frogImageRight);
+			frogLabel.setIcon(frog.getFrogImageRight());
 			if (x >= GameProperties.SCREEN_WIDTH) {
 				x = -1 * frog.getWidth();
 			}
@@ -187,7 +171,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {}
-
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -242,12 +226,13 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
     }
 
 	//create logs
-	public void createLogs(Log[] log, int x, int y) {
+	public void createLogs(Log[] log, int x, int y, boolean rDirection) {
 		for (int i = 0; i < log.length; i++) {
 			log[i] = new Log();
 			log[i].setY(y);
 			log[i].setX(x);
 			log[i].setFrog(frog);
+			log[i].setReverseDirection(rDirection);
 
 			logLabel = new JLabel();
 			logImage = new ImageIcon(getClass().getResource(log[i].getImage()));
