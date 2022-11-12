@@ -71,6 +71,11 @@ public class Car extends Sprite implements Runnable {
 		}
 	}
 
+	//stop car
+	public void stopCar() {
+		this.moving = false;
+	}
+
 	@Override
 	public void run() {
 		System.out.println("Thread started");
@@ -103,20 +108,18 @@ public class Car extends Sprite implements Runnable {
             int currentX = this.x;
 
             //increase x
-            currentX += GameProperties.CHARACTER_STEP;
+            currentX += 20;
 
             //boundary check right-side
             if (currentX >= GameProperties.SCREEN_WIDTH) {
                 currentX = -1 * this.width;
             }
             this.setX(currentX);
-            // System.out.println("X, Y: " + this.x + "," + this.y);
-
+			
 			 //check for collision
             if ( this.visible ) {
                 if (isColliding(Frog)) {
                     System.out.println("BOOM!");
-                    this.moving = false;
                 }
             }
 			
@@ -129,7 +132,6 @@ public class Car extends Sprite implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
 		}
 		System.out.println("End Thread");	
 	}

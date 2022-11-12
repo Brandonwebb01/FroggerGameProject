@@ -11,7 +11,7 @@ public class Log extends Sprite implements Runnable {
 	
 	//Constructor
 	public Log() {
-		super(0, 0, 75, 75, "log-sprite.png");
+		super(0, 0, 50, 75, "log-sprite.png");
 		this.visible = true;
 		this.moving = false;
 		this.reverseDirection = true;
@@ -81,6 +81,11 @@ public class Log extends Sprite implements Runnable {
 		}
 	}
 
+	//stop moving
+	public void stopLog() {
+		this.moving = false;
+	}
+
 	@Override
 	public void run() {
 		System.out.println("Thread started");
@@ -88,48 +93,43 @@ public class Log extends Sprite implements Runnable {
 
 		if (getLogID() == 1) {
             try {
-                Thread.sleep(500 + (int)(Math.random() * 2000));
+                //Thread.sleep(500 + (int)(Math.random() * 2000));
+				Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else if (getLogID() == 2) {
             try {
-                Thread.sleep(2500 + (int)(Math.random() * 4000));
+                //Thread.sleep(2500 + (int)(Math.random() * 4000));
+				Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else if (getLogID() == 3) {
             try {
-                Thread.sleep(5500 + (int)(Math.random() * 3000));
+                //Thread.sleep(5500 + (int)(Math.random() * 3000));
+				Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+		
+		while (this.moving) {
 
-		if (this.reverseDirection == true) {
-
-			while (this.moving) {
-				//moving instructions
+		if (this.reverseDirection == false) {
 				
 				//get current x
 				int currentX = this.x;
 	
 				//increase x
-				currentX += GameProperties.CHARACTER_STEP;
+				//currentX += GameProperties.CHARACTER_STEP;
+				currentX += 20;
 	
 				//boundary check right-side
 				if (currentX >= GameProperties.SCREEN_WIDTH) {
 					currentX = -1 * this.width;
 				}
 				this.setX(currentX);
-				// System.out.println("X, Y: " + this.x + "," + this.y);
-	
-				 //check for collision
-				if ( this.visible ) {
-					if (isColliding(Frog)) {
-						System.out.println("On Log");
-					}
-				}
 				
 				//update Character2Label
 				this.logLabel.setLocation(this.x, this.y);
@@ -140,32 +140,22 @@ public class Log extends Sprite implements Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
 		} else {
-
-			while (this.moving) {
-				//moving instructions
 				
 				//get current x
 				int currentX = this.x;
 	
 				//increase x
-				currentX -= GameProperties.CHARACTER_STEP;
+				//currentX -= GameProperties.CHARACTER_STEP;
+				currentX -= 20;
+
 	
-				//boundary check right-side
+				//boundary check left-side
 				if (currentX <= -1 * this.width) {
 					currentX = GameProperties.SCREEN_WIDTH;
 				}
 				this.setX(currentX);
-				// System.out.println("X, Y: " + this.x + "," + this.y);
-	
-				 //check for collision
-				if ( this.visible ) {
-					if (isColliding(Frog)) {
-						System.out.println("On Log");
-					}
-				}
-				
+			
 				//update Character2Label
 				this.logLabel.setLocation(this.x, this.y);
 				
@@ -175,9 +165,19 @@ public class Log extends Sprite implements Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}	
+			
+			if ( this.visible ) {
+				if (isColliding(Frog)) {
+					System.out.println("On Log");
+					Frog.setX(this.x);
+					Frog.getFrogLabel().setLocation(getX() + 45, getY());
+					if (this.reverseDirection == true) {
+						Frog.getFrogLabel().setLocation(getX(), getY());
+					}
+				}
 			}
 		}
-
 		
 		System.out.println("End Thread");	
 	}

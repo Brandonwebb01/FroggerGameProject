@@ -1,13 +1,19 @@
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import java.util.ArrayList;
+import java.awt.event.KeyEvent;
+
 //Player Character
-public class Frog extends Sprite {
+public class Frog extends Sprite implements Runnable {
 
 	private JLabel frogLabel = new JLabel();
 	private ImageIcon frogImage;
 	private ImageIcon frogImageDown;
 	private ImageIcon frogImageRight;
 	private ImageIcon frogImageLeft;
+	private Thread t;
+	private ArrayList<Log[]> logs;
+
 	//Constructor
 	public Frog() {
 		super(0, 0, 39, 50, "frog-sprite.png");	
@@ -17,7 +23,6 @@ public class Frog extends Sprite {
 		this.setHeight(39);
 		this.setImage("frog-sprite.png");
 
-		//frogLabel = new JLabel();
 		frogImage = new ImageIcon(getClass().getResource(this.getImage()));
 		frogImageDown = new ImageIcon(getClass().getResource("frog-sprite-down.png"));
 		frogImageRight = new ImageIcon(getClass().getResource("frog-sprite-right.png"));
@@ -27,45 +32,161 @@ public class Frog extends Sprite {
 		frogLabel.setLocation(this.getX(), this.getY());
 	}
 
-	    // getters and setters for imageicons
-		public ImageIcon getFrogImage() {
-			return frogImage;
+	//getters and setters for imageicons
+	public ImageIcon getFrogImage() {
+		return frogImage;
+	}
+
+	public void setFrogImage(ImageIcon frogImage) {
+		this.frogImage = frogImage;
+	}
+
+	public ImageIcon getFrogImageRight() {
+		return frogImageRight;
+	}
+
+	public void setFrogImageRight(ImageIcon frogImageRight) {
+		this.frogImageRight = frogImageRight;
+	}
+
+	public ImageIcon getFrogImageDown() {
+		return frogImageDown;
+	}
+
+	public void setFrogImageDown(ImageIcon frogImageDown) {
+		this.frogImageDown = frogImageDown;
+	}
+
+	public ImageIcon getFrogImageLeft() {
+		return frogImageLeft;
+	}
+
+	public void setFrogImageLeft(ImageIcon frogImageLeft) {
+		this.frogImageLeft = frogImageLeft;
+	}
+
+	// setter and getter for frogLabel
+	public JLabel getFrogLabel() {
+		return frogLabel;
+	}
+
+	public void setFrogLabel(JLabel frogLabel) {
+		this.frogLabel = frogLabel;
+	}
+
+	// getter and setter for logs
+	public ArrayList<Log[]> getLogs() {
+		return logs;
+	}
+
+	public void setLogs(ArrayList<Log[]> logs) {
+		this.logs = logs;
+	}
+
+	@Override
+	public void run() {			
+
+	}
+
+	public void startFrogLogic() {
+		t = new Thread(this, "Frog Logic Thread");
+		t.start();
+
+	}
+
+	// method to check if frog is in water
+	public boolean isInWater() {
+		if (getY() > 35 && getY() < 350) {
+			return true;
 		}
-	
-		public void setFrogImage(ImageIcon frogImage) {
-			this.frogImage = frogImage;
+		return false;
+	}
+
+	public void attachFrogToLog() {
+		if (isOnLog()) {
+			for (int i = 0; i < logs.size(); i++) {
+				for (int j = 0; j < logs.get(i).length; j++) {
+					if (getX() > logs.get(i)[j].getX() && getX() < logs.get(i)[j].getX() + logs.get(i)[j].getWidth()) {
+						if (getY() > logs.get(i)[j].getY() && getY() < logs.get(i)[j].getY() + logs.get(i)[j].getHeight()) {
+							setY(logs.get(i)[j].getY());
+							setX(logs.get(i)[j].getX());
+						}
+					}
+				}
+			}
 		}
-	
-		public ImageIcon getFrogImageRight() {
-			return frogImageRight;
+	}
+
+	//method to check if frog is on a log
+	public boolean isOnLog() {
+		for (int i = 0; i < logs.size(); i++) {
+			for (int j = 0; j < logs.get(i).length; j++) {
+				if (getX() > logs.get(i)[j].getX() && getX() < logs.get(i)[j].getX() + logs.get(i)[j].getWidth()) {
+					if (getY() > logs.get(i)[j].getY() && getY() < logs.get(i)[j].getY() + logs.get(i)[j].getHeight()) {
+						return true;
+					}
+				}
+			}
 		}
-	
-		public void setFrogImageRight(ImageIcon frogImageRight) {
-			this.frogImageRight = frogImageRight;
+		return false;
+	}
+
+	public void moveFrog(KeyEvent e) {
+		int xPos = getX();
+		int yPos = getY();
+
+		//modify position
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			yPos -= GameProperties.CHARACTER_STEP;
+			frogLabel.setIcon(getFrogImage());
+			if (yPos + getHeight() <= 0) {
+				yPos = GameProperties.SCREEN_HEIGHT;
+			}
+			
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			yPos += GameProperties.CHARACTER_STEP;
+			frogLabel.setIcon(getFrogImageDown());
+			if (yPos >= GameProperties.SCREEN_HEIGHT) {
+				yPos = -1 * getHeight();
+			}
+			
+		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			xPos -= GameProperties.CHARACTER_STEP;	
+			frogLabel.setIcon(getFrogImageLeft());
+			if (xPos + getWidth() <= 0) {
+				xPos = GameProperties.SCREEN_WIDTH;
+			}			
+			
+		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			xPos += GameProperties.CHARACTER_STEP;	
+			frogLabel.setIcon(getFrogImageRight());
+			if (xPos >= GameProperties.SCREEN_WIDTH) {
+				xPos = -1 * getWidth();
+			}
+
+		} else {
+			System.out.println("Invalid operation");
 		}
-	
-		public ImageIcon getFrogImageDown() {
-			return frogImageDown;
+
+		if (isOnLog()) {
+			attachFrogToLog();
+		} else if (!isOnLog() && isInWater()) {
+			System.out.println("SPASH!!!");
+			setX(xPos);
+			setY(yPos);
+		} else {
+			setX(xPos);
+			setY(yPos);
 		}
-	
-		public void setFrogImageDown(ImageIcon frogImageDown) {
-			this.frogImageDown = frogImageDown;
-		}
-	
-		public ImageIcon getFrogImageLeft() {
-			return frogImageLeft;
-		}
-	
-		public void setFrogImageLeft(ImageIcon frogImageLeft) {
-			this.frogImageLeft = frogImageLeft;
-		}
-	
-		// setter and getter for frogLabel
-		public JLabel getFrogLabel() {
-			return frogLabel;
-		}
-	
-		public void setFrogLabel(JLabel frogLabel) {
-			this.frogLabel = frogLabel;
-		}
+		
+		//update graphic
+		frogLabel.setLocation(getX(), getY());
+	}
+
+	//reset frog to starting position
+	public void resetFrog() {
+		setX(450);
+		setY(750);
+		frogLabel.setLocation(450, 750);
+	}
 }

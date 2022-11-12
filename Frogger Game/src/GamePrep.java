@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,8 +15,9 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	
 	//instances of our data classes (store position, etc here)
 	private Frog frog;
-	private Car car;
 	private Background background;
+	private int score = 0;
+
 
 	//array of cars
 	private Car[] cars = new Car[3];
@@ -34,12 +36,12 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	
 	//graphic elements
 	private Container content;
-	private JLabel frogLabel, carLabel, backgroundLabel, logLabel;
+	private JLabel frogLabel, carLabel, backgroundLabel, logLabel, scoreLabel;
 	private ImageIcon carImage, backgroundImage, logImage;
 	
 	//buttons
-	private JButton StartButton;
-	private JButton VisibilityButton;
+	private JButton StartButton, RestartButton;
+	// private JButton VisibilityButton;
 	
 	public GamePrep() {
 		
@@ -84,28 +86,27 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		//add a start button
 		StartButton = new JButton ("Start");
 		StartButton.setSize(100, 100);
-		StartButton.setLocation(GameProperties.SCREEN_WIDTH-100, 
-				                GameProperties.SCREEN_HEIGHT-200);
+		StartButton.setLocation(GameProperties.SCREEN_WIDTH/2 - StartButton.getWidth()/2,
+								GameProperties.SCREEN_HEIGHT/2 - StartButton.getHeight()/2);
 		StartButton.setFocusable(false);
+
+		//add a restart button
+		RestartButton = new JButton ("Restart");
+		RestartButton.setSize(100, 25);
+		RestartButton.setLocation(900, 762);
+		RestartButton.setFocusable(false);
+		RestartButton.setVisible(false);
 		
-		
-		//add a disappear button
-		VisibilityButton = new JButton ("Hide");
-		VisibilityButton.setSize(100, 50);
-		VisibilityButton.setLocation(GameProperties.SCREEN_WIDTH-100, 
-				                     GameProperties.SCREEN_HEIGHT-100);
-		VisibilityButton.setFocusable(false);
-		
+
 		//populate screen
 		add(StartButton);
 		StartButton.addActionListener(this);
-		add(VisibilityButton);
-		VisibilityButton.addActionListener(this);
+		add(RestartButton);
+		RestartButton.addActionListener(this);
 		add(frogLabel);
 		add(carLabel);
 		add(logLabel);
 		add(backgroundLabel);
-		
 		
 		content.addKeyListener(this);
 		content.setFocusable(true);
@@ -126,57 +127,21 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		int x = frog.getX();
-		int y = frog.getY();
-		
-		//modify position
-		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			y -= GameProperties.CHARACTER_STEP;
-			frogLabel.setIcon(frog.getFrogImage());
-			if (y + frog.getHeight() <= 0) {
-				y = GameProperties.SCREEN_HEIGHT;
-			}
-			
-		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			y += GameProperties.CHARACTER_STEP;
-			frogLabel.setIcon(frog.getFrogImageDown());
-			if (y >= GameProperties.SCREEN_HEIGHT) {
-				y = -1 * frog.getHeight();
-			}
-			
-		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			x -= GameProperties.CHARACTER_STEP;	
-			frogLabel.setIcon(frog.getFrogImageLeft());
-			if (x + frog.getWidth() <= 0) {
-				x = GameProperties.SCREEN_WIDTH;
-			}			
-			
-		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			x += GameProperties.CHARACTER_STEP;	
-			frogLabel.setIcon(frog.getFrogImageRight());
-			if (x >= GameProperties.SCREEN_WIDTH) {
-				x = -1 * frog.getWidth();
-			}
-
-		} else {
-			System.out.println("Invalid operation");
-		}
-		frog.setX(x);
-		frog.setY(y);
-		
-		//update graphic
-		frogLabel.setLocation(frog.getX(), frog.getY());
+		frog.moveFrog(e);
 	}
 
 
 	@Override
-	public void keyReleased(KeyEvent e) {}
-	
+	public void keyReleased(KeyEvent e) {}	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//distinguish among buttons
 		if (e.getSource() == StartButton) {
+
+			//hide start button when game starts
+			StartButton.setVisible(false);
+			RestartButton.setVisible(true);
 
 			showCarsArray(cars);
 			showCarsArray(cars2);
@@ -184,30 +149,64 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 			showCarsArray(cars4);
 			showCarsArray(cars5);
 
+			//list of log arrays for frog class
+			ArrayList<Log[]> logsList = new ArrayList<Log[]>();
+			logsList.add(logs);
+			logsList.add(logs2);
+			logsList.add(logs3);
+			logsList.add(logs4);
+			logsList.add(logs5);
+			logsList.add(logs6);
+
 			showLogsArray(logs);
 			showLogsArray(logs2);
 			showLogsArray(logs3);
 			showLogsArray(logs4);
 			showLogsArray(logs5);
 			showLogsArray(logs6);
-			
-					
-		} else if (e.getSource() == VisibilityButton) {
-			//check the visibility of the character2 object
-			if ( car.getVisible() ) {
-				//if visible, hide, change text of button to show
-				car.setVisible(false);
-				carLabel.setVisible(car.getVisible());
-				VisibilityButton.setText("Show");
-			} else {
-				//if hidden, show, change text of button to hide
-				car.setVisible(true);
-				carLabel.setVisible(car.getVisible());
-				VisibilityButton.setText("Hide");
+
+			frog.setLogs(logsList);
+			frog.startFrogLogic();
+		}
+		else if (e.getSource() == RestartButton) {
+			StartButton.setVisible(true);
+			RestartButton.setVisible(false);
+			frog.resetFrog();
+			//stop all threads
+			for (int i = 0; i < cars.length; i++) {
+				cars[i].stopCar();
+				cars2[i].stopCar();
+				cars3[i].stopCar();
+				cars4[i].stopCar();
+				cars5[i].stopCar();
+			}
+
+			for (int i = 0; i < logs.length; i++) {
+				logs[i].stopLog();
+				logs2[i].stopLog();
+				logs3[i].stopLog();
+				logs4[i].stopLog();
+				logs5[i].stopLog();
+				logs6[i].stopLog();
 			}
 		}
 	}
 
+	//score method
+	public void score() {
+		//if frog reaches the top of the screen
+		if (frog.getY() <= 35) {
+			System.out.println("Nice Job!");
+			//add 100 points
+			score += 100;
+			//print score
+			System.out.println("Score: " + score);
+			//reset frog
+			frog.resetFrog();
+		}
+	}
+
+	//create logs
 	public void createCars(Car[] car, int x, int y) {
         for (int i = 0; i < car.length; i++) {
             car[i] = new Car();
@@ -244,6 +243,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		}
 	}
 
+	//show car array
 	public void showCarsArray(Car[] carArray) {
 		for (int i = 0; i < carArray.length; i++) {
 			carArray[i].setCarID(i);
@@ -257,6 +257,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		}
 	}
 
+	//show log array
 	public void showLogsArray(Log[] logArray) {
 		for (int i = 0; i < logArray.length; i++) {
 			logArray[i].setLogID(i);
