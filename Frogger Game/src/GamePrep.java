@@ -16,7 +16,8 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 	//instances of our data classes (store position, etc here)
 	private Frog frog;
 	private Background background;
-	private int score;
+	private int score, finalScore;
+	private SqlDatabase sql = new SqlDatabase();
 
 	//array of cars
 	private Car[] cars = new Car[3];
@@ -35,15 +36,16 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 	
 	//graphic elements
 	private Container content;
-	private JLabel frogLabel, carLabel, backgroundLabel, logLabel, scoreLabel;
+	private JLabel frogLabel, carLabel, backgroundLabel, logLabel, scoreLabel, oldScoreLabel;
 	private ImageIcon carImage, backgroundImage, logImage;
 	private Boolean runThread = true;
 	
 	//buttons
-	private JButton StartButton, RestartButton;
+	private JButton StartButton, RestartButton, SaveScoreButton;
 	
 	public GamePrep() {
 		
+		int oldScore = sql.getScore();
 			
 		//set up background
 		background = new Background();
@@ -95,12 +97,24 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 		RestartButton.setLocation(900, 762);
 		RestartButton.setFocusable(false);
 		RestartButton.setVisible(false);
+		
+		//add a Save Score Button
+		SaveScoreButton = new JButton ("Save Score");
+		SaveScoreButton.setSize(100, 25);
+		SaveScoreButton.setLocation(900, 737);
+		SaveScoreButton.setFocusable(false);
+		SaveScoreButton.setVisible(false);
 
 		//add score label
 		scoreLabel = new JLabel("Score: " + score);
 		scoreLabel.setSize(100, 25);
-		scoreLabel.setLocation(900, 0);
+		scoreLabel.setLocation(800, 0);
 		scoreLabel.setVisible(true);
+		
+		oldScoreLabel = new JLabel("Saved Score: " + oldScore);
+		oldScoreLabel.setSize(150, 25);
+		oldScoreLabel.setLocation(30, 0);
+		oldScoreLabel.setVisible(true);
 
 		
 
@@ -109,6 +123,9 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 		add(scoreLabel);
 		StartButton.addActionListener(this);
 		add(RestartButton);
+		add(SaveScoreButton);
+		add(oldScoreLabel);
+		SaveScoreButton.addActionListener(this);
 		RestartButton.addActionListener(this);
 		add(frogLabel);
 		add(carLabel);
@@ -144,10 +161,15 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 	public void actionPerformed(ActionEvent e) {
 		//distinguish among buttons
 		if (e.getSource() == StartButton) {
-
+			
+//			SqlDatabase sql = new SqlDatabase();
+//			System.out.println(sql.getScore());
+			
 			//hide start button when game starts
 			StartButton.setVisible(false);
 			RestartButton.setVisible(true);
+			SaveScoreButton.setVisible(false);
+			oldScoreLabel.setVisible(false);
 			runThread = true;
 			// start counter
 			score = 5000;
@@ -182,6 +204,7 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 		else if (e.getSource() == RestartButton) {
 			StartButton.setVisible(true);
 			RestartButton.setVisible(false);
+			SaveScoreButton.setVisible(false);
 			frog.resetFrog();
 			//stop all threads
 			for (int i = 0; i < cars.length; i++) {
@@ -200,6 +223,8 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 				logs5[i].stopLog();
 				logs6[i].stopLog();
 			}
+		} else if (e.getSource() == SaveScoreButton){
+			sql.setScore(Integer.toString(finalScore));
 		}
 	}
 
@@ -280,16 +305,18 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener, Run
 	public void run() {
 		while (runThread && score != 0) {
 			try {
-				Thread.sleep(1000);
 				score = score - 150;
 				scoreLabel.setText("Score: " + score);
+				if (frog.getY() < 20) {
+					finalScore = score;
+					SaveScoreButton.setVisible(true);
+					scoreLabel.setText("You Win! " + finalScore);
+					frog.resetFrog();
+					runThread = false;
+				}
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
-			if (frog.getY() < 20) {
-				scoreLabel.setText("You Win!");
-				frog.resetFrog();
-				runThread = false;
 			}
 			if (score < 1) {
 				scoreLabel.setText("You Lose!");

@@ -1,7 +1,8 @@
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import java.util.ArrayList;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 //Player Character
 public class Frog extends Sprite implements Runnable {
