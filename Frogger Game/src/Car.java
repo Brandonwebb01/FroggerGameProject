@@ -119,6 +119,7 @@ public class Car extends Sprite implements Runnable {
 			 //check for collision
             if ( this.visible ) {
                 if (isColliding(Frog)) {
+					Frog.resetFrog();
                     System.out.println("BOOM!");
                 }
             }

@@ -11,13 +11,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class GamePrep extends JFrame implements KeyListener, ActionListener {
+public class GamePrep extends JFrame implements KeyListener, ActionListener, Runnable {
 	
 	//instances of our data classes (store position, etc here)
 	private Frog frog;
 	private Background background;
-	private int score = 0;
-
+	private int score;
 
 	//array of cars
 	private Car[] cars = new Car[3];
@@ -38,10 +37,10 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 	private Container content;
 	private JLabel frogLabel, carLabel, backgroundLabel, logLabel, scoreLabel;
 	private ImageIcon carImage, backgroundImage, logImage;
+	private Boolean runThread = true;
 	
 	//buttons
 	private JButton StartButton, RestartButton;
-	// private JButton VisibilityButton;
 	
 	public GamePrep() {
 		
@@ -96,10 +95,18 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		RestartButton.setLocation(900, 762);
 		RestartButton.setFocusable(false);
 		RestartButton.setVisible(false);
+
+		//add score label
+		scoreLabel = new JLabel("Score: " + score);
+		scoreLabel.setSize(100, 25);
+		scoreLabel.setLocation(900, 0);
+		scoreLabel.setVisible(true);
+
 		
 
 		//populate screen
 		add(StartButton);
+		add(scoreLabel);
 		StartButton.addActionListener(this);
 		add(RestartButton);
 		RestartButton.addActionListener(this);
@@ -130,7 +137,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 		frog.moveFrog(e);
 	}
 
-
 	@Override
 	public void keyReleased(KeyEvent e) {}	
 
@@ -142,6 +148,11 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 			//hide start button when game starts
 			StartButton.setVisible(false);
 			RestartButton.setVisible(true);
+			runThread = true;
+			// start counter
+			score = 5000;
+			scoreLabel.setText("Score: " + score);
+			scoreLogic();
 
 			showCarsArray(cars);
 			showCarsArray(cars2);
@@ -189,20 +200,6 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 				logs5[i].stopLog();
 				logs6[i].stopLog();
 			}
-		}
-	}
-
-	//score method
-	public void score() {
-		//if frog reaches the top of the screen
-		if (frog.getY() <= 35) {
-			System.out.println("Nice Job!");
-			//add 100 points
-			score += 100;
-			//print score
-			System.out.println("Score: " + score);
-			//reset frog
-			frog.resetFrog();
 		}
 	}
 
@@ -267,6 +264,37 @@ public class GamePrep extends JFrame implements KeyListener, ActionListener {
 			} else {
 				logArray[i].setVisible(true);
 				logArray[i].startMoving();
+			}
+		}
+	}
+
+	//start thread function
+	public void scoreLogic() {
+		Thread t = new Thread(this);
+		t.start();
+	}
+
+
+	//runnable method
+	@Override
+	public void run() {
+		while (runThread && score != 0) {
+			try {
+				Thread.sleep(1000);
+				score = score - 150;
+				scoreLabel.setText("Score: " + score);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (frog.getY() < 20) {
+				scoreLabel.setText("You Win!");
+				frog.resetFrog();
+				runThread = false;
+			}
+			if (score < 1) {
+				scoreLabel.setText("You Lose!");
+				frog.resetFrog();
+				runThread = false;
 			}
 		}
 	}
